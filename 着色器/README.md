@@ -19,7 +19,7 @@ const char* fragmentShaderSource = "#version 330 core\n"
 
 ```
 
-![](../images/../assets/images/20220802151412.png)
+![](../assets/images/20220802151412.png)
 
 ## 顶点颜色不同
 
@@ -158,7 +158,7 @@ int main() {
 }
 ```
 
-![](../images/../assets/images/20220802152510.png)
+![](../assets/images/20220802152510.png)
 
 ## 画变化颜色的三角形
 

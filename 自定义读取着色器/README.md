@@ -250,7 +250,7 @@ int main() {
 }
 ```
 
-![](../images/../assets/images/20220802154735.png)
+![](../assets/images/20220802154735.png)
 
 
 

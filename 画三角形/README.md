@@ -111,7 +111,7 @@ int main() {
 
 ## 测试
 
-![](../images/../assets/images/20220802145840.png)
+![](../assets/images/20220802145840.png)
 
 ## 画两个三角形
 
@@ -240,4 +240,4 @@ int main() {
 
 ## 测试
 
-![](../images/../assets/images/20220802150643.png)
+![](../assets/images/20220802150643.png)
