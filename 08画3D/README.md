@@ -1,55 +1,3 @@
-## 安装GLM
-
-> 0.9.8（包含）以前的版本初始化出来的矩阵是单位矩阵，0.9.9开始往后初始化的矩阵是0矩阵
-
-下载 `assets/glm-0.9.8`
-
-## 配置
-
-![](../assets/images/20220804150923.png)
-
-## 测试
-
-```cpp
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <iostream>
-
-int main() {
-	/*glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);*/
-	// 译注：下面就是矩阵初始化的一个例子，如果使用的是0.9.9及以上版本
-	// 下面这行代码就需要改为:
-	// glm::mat4 trans = glm::mat4(1.0f)
-	// 之后将不再进行提示
-
-	// 位移
-	glm::vec4 vec1(1.0f, 0.0f, 0.0f, 1.0f);
-	glm::mat4 trans1;
-	trans1 = glm::translate(trans1, glm::vec3(1.0f, 1.0f, 0.0f));
-	vec1 = trans1 * vec1;
-	std::cout << vec1.x << " " << vec1.y << " " << vec1.z << " " << std::endl;
-
-	// 缩放
-	glm::vec4 vec2(1.0f, 0.0f, 0.0f, 1.0f);
-	glm::mat4 trans2;
-	trans2 = glm::scale(trans2, glm::vec3(2.0f, 2.0f, 2.0f));
-	vec2 = trans2 * vec2;
-	std::cout << vec2.x << " " << vec2.y << " " << vec2.z << " " << std::endl;
-
-	// 旋转
-	glm::vec4 vec3(1.0f, 0.0f, 0.0f, 1.0f);
-	glm::mat4 trans3;
-	trans3 = glm::rotate(trans3, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	vec3 = trans3 * vec3;
-	std::cout << vec3.x << " " << vec3.y << " " << vec3.z << " " << std::endl;
-
-	return 0;
-}
-```
-
-## 让材质动起来
 
 main.cpp
 ```cpp
@@ -68,6 +16,9 @@ main.cpp
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+float screenWidth = 800.0f;
+float screenHeight = 600.0f;
+
 void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
@@ -80,7 +31,7 @@ int main() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "LearnOpenGL", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -97,16 +48,55 @@ int main() {
 		return -1;
 	}
 
+	// 启用深度测试
+	glEnable(GL_DEPTH_TEST);
+
 	// 初始化着色器
 	Shader* shader = new Shader("vertexSource.txt", "fragmentSource.txt");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	float vertices[] = {
-		// positions          // colors           // texture coords
-		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 	unsigned int indices[] = {
 		0, 1, 3, // first triangle
@@ -127,13 +117,13 @@ int main() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	//glEnableVertexAttribArray(1);
 	// texture coord attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
 	// load and create a texture
@@ -187,22 +177,28 @@ int main() {
 	glUniform1i(glGetUniformLocation(shader->ID, "texture1"), 0);
 	glUniform1i(glGetUniformLocation(shader->ID, "texture2"), 1);
 
-	glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-	glm::mat4 trans;
+	glm::mat4 model;
+	model = glm::rotate(model, glm::radians(-45.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
+	glm::mat4 view;
+	// 注意，我们将矩阵向我们要进行移动场景的反方向移动。
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+	glm::mat4 projection;
+	projection = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
+
+	glUniformMatrix4fv(glGetUniformLocation(shader->ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(glGetUniformLocation(shader->ID, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(shader->ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 	// 渲染循环
 	while (!glfwWindowShouldClose(window))
 	{
-		trans = glm::rotate(trans, glm::radians(1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		unsigned int transformLoc = glGetUniformLocation(shader->ID, "transform");
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-
 		// 输入
 		processInput(window);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// bind Texture
 		glActiveTexture(GL_TEXTURE0);
@@ -214,7 +210,8 @@ int main() {
 		// 渲染指令
 		glBindVertexArray(VAO);
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		// 检查并调用事件，交换缓冲
 		glfwSwapBuffers(window);
@@ -230,23 +227,4 @@ int main() {
 }
 ```
 
-vertexSource.txt
-
-```
-#version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aColor;
-layout (location = 2) in vec2 aTexCoord;
-
-out vec3 ourColor;
-out vec2 TexCoord;
-
-uniform mat4 transform;
-
-void main()
-{
-	gl_Position = transform * vec4(aPos, 1.0);
-	ourColor = aColor;
-	TexCoord = vec2(aTexCoord.x, aTexCoord.y);
-}
-```
+![](../assets/images/20220815134700.png)
